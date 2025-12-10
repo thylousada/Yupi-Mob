@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Yupi Mob – Marketplace Imobiliário Definitivo</title>
+<style>
+body { font-family:'Segoe UI', Tahoma, Geneva, Verdana,sans-serif; margin:0; padding:0; background:#f2f2f2; }
+header { background:#27ae60; padding:25px; color:white; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.2);}
+nav { background:#2C3E50; padding:12px; text-align:center;}
+nav a { color:white; margin:0 15px; text-decoration:none; font-weight:bold; transition:0.3s;}
+nav a:hover { color:#27ae60;}
+.banner { padding:50px 20px; text-align:center; background:white; box-shadow:0 2px 6px rgba(0,0,0,0.1); margin-bottom:20px;}
+.banner h2 { margin-bottom:15px; font-size:1.8em;}
+.filtros { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:20px 0; }
+.filtros input, select { padding:10px; border-radius:6px; border:1px solid #ccc; font-size:1em; }
+.listagem { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px,1fr)); gap:25px; padding:20px;}
+.card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.15); position:relative; transition: transform 0.3s, box-shadow 0.3s;}
+.card:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.25);}
+.slider { position:relative; overflow:hidden; height:220px; }
+.slider img { width:100%; height:220px; object-fit:cover; display:none; transition:opacity 0.5s; }
+.slider img.active { display:block; }
+.slider-controls { position:absolute; top:50%; width:100%; display:flex; justify-content:space-between; transform:translateY(-50%); padding:0 10px; box-sizing:border-box; }
+.slider-controls span { background:rgba(0,0,0,0.5); color:white; padding:5px 10px; border-radius:50%; cursor:pointer; user-select:none; font-weight:bold; }
+.card-content { padding:20px;}
+.card-content h3 { margin:0 0 10px; font-size:1.2em; color:#2C3E50;}
+.card-content p { margin:5px 0; color:#555; font-size:0.95em;}
+.btn { display:inline-block; margin-top:12px; background:#27ae60; color:white; padding:10px 18px; border-radius:6px; text-decoration:none; font-weight:bold; transition:0.3s;}
+.btn:hover { background:#1e8449;}
+.destaque { border:2px solid #e67e22; background-color:#fdf3e7; animation:pulse 2s infinite; }
+.tag-destaque { position:absolute; top:12px; left:12px; background-color:#e67e22; color:white; padding:5px 10px; border-radius:4px; font-weight:bold; font-size:0.9em; text-transform:uppercase; }
+.tag-vendido { position:absolute; top:12px; right:12px; background-color:#c0392b; color:white; padding:5px 10px; border-radius:4px; font-weight:bold; font-size:0.9em; text-transform:uppercase; }
+.preco-destaque { color:#e67e22; font-weight:bold; font-size:1.1em; }
+footer { text-align:center; padding:25px; background:#2C3E50; color:white; margin-top:30px; font-size:0.95em; }
+@keyframes pulse { 0%{box-shadow:0 0 0 rgba(230,126,34,0.4);} 50%{box-shadow:0 0 15px rgba(230,126,34,0.6);} 100%{box-shadow:0 0 0 rgba(230,126,34,0.4);} }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.4/tabletop.min.js"></script>
+</head>
+<body>
+
+<header>
+<h1>Yupi Mob</h1>
+<p>Marketplace Imobiliário Definitivo em Angola</p>
+</header>
+
+<nav>
+<a href="#home">Início</a>
+<a href="#imoveis">Imóveis</a>
+<a href="#enviar">Enviar Imóvel</a>
+<a href="#contactos">Contactos</a>
+</nav>
+
+<section class="banner" id="home">
+<h2>Encontre imóveis em Angola com filtros avançados e busca inteligente.</h2>
+<p>Casas, apartamentos, terrenos, escritórios e muito mais.</p>
+</section>
+
+<section id="imoveis">
+<h2 style="text-align:center; padding-top:20px;">Imóveis disponíveis</h2>
+<div class="filtros">
+<select id="filtro-cidade"><option value="">Todas as Cidades</option></select>
+<select id="filtro-tipo">
+<option value="">Todos os Tipos</option>
+<option value="Casa">Casa</option>
+<option value="Apartamento">Apartamento</option>
+<option value="Terreno">Terreno</option>
+<option value="Escritório">Escritório</option>
+<option value="Loja">Loja</option>
+<option value="Armazém">Armazém</option>
+<option value="Outro">Outro</option>
+</select>
+<input type="number" id="preco-min" placeholder="Preço Min (Kz)">
+<input type="number" id="preco-max" placeholder="Preço Max (Kz)">
+<input type="number" id="quartos-min" placeholder="Mín. Quartos">
+<input type="number" id="quartos-max" placeholder="Máx. Quartos">
+<input type="text" id="busca" placeholder="Buscar bairro, referência, descrição">
+<select id="ordenar">
+<option value="">Ordenar</option>
+<option value="preco-asc">Preço Crescente</option>
+<option value="preco-desc">Preço Decrescente</option>
+<option value="data-desc">Mais Recentes</option>
+</select>
+</div>
+<div class="listagem" id="listagem-imoveis"></div>
+</section>
+
+<section id="enviar" style="padding:50px 20px; text-align:center;">
+<h2>Enviar Imóvel</h2>
+<p>Submeta gratuitamente o seu imóvel para venda ou arrendamento.</p>
+<iframe src="https://tally.so/embed/aQ9Ajv" width="100%" height="850" frameborder="0" marginheight="0" marginwidth="0" title="Formulário Yupi Mob"></iframe>
+</section>
+
+<section id="contactos" style="padding:50px 20px; text-align:center;">
+<h2>Contactos</h2>
+<p>WhatsApp: +244 XXX XXX XXX</p>
+<p>Email: info@yupimob.com</p>
+</section>
+
+<footer>
+Yupi Mob © 2025 – Marketplace Imobiliário de Angola
+</footer>
+
+<script>
+let todosImoveis = [];
+const filtroCidade = document.getElementById('filtro-cidade');
+const filtroTipo = document.getElementById('filtro-tipo');
+const precoMin = document.getElementById('preco-min');
+const precoMax = document.getElementById('preco-max');
+const quartosMin = document.getElementById('quartos-min');
+const quartosMax = document.getElementById('quartos-max');
+const busca = document.getElementById('busca');
+const ordenar = document.getElementById('ordenar');
+const container = document.getElementById('listagem-imoveis');
+
+function popularCidades(data){
+  const cidades = [...new Set(data.map(item=>item.Cidade))].sort();
+  cidades.forEach(cidade=>{
+    const opt = document.createElement('option');
+    opt.value = cidade;
+    opt.textContent = cidade;
+    filtroCidade.appendChild(opt);
+  });
+}
+
+window.addEventListener('DOMContentLoaded', function(){
+  const publicSpreadsheetUrl = 'COLE_AQUI_SEU_URL_PUBLICADO_DO_GOOGLE_SHEET';
+  Tabletop.init({
+    key: publicSpreadsheetUrl,
+    callback: function(data){
+      todosImoveis = data.filter(item=>item.Estado==='Ativo');
+      todosImoveis.forEach(item=>{
+        item.Data = item.Data || new Date().toISOString();
+      });
+      popularCidades(todosImoveis);
+      renderImoveis();
+    },
+    simpleSheet:true
+  });
+
+  [filtroCidade,filtroTipo,precoMin,precoMax,quartosMin,quartosMax,busca,ordenar].forEach(el=>el.addEventListener('change', renderImoveis));
+
+  function renderImoveis(){
+    container.innerHTML='';
+    const cidade=filtroCidade.value;
+    const tipo=filtroTipo.value;
+    const pMin=parseFloat(precoMin.value)||0;
+    const pMax=parseFloat(precoMax.value)||Infinity;
+    const qMin=parseInt(quartosMin.value)||0;
+    const qMax=parseInt(quartosMax.value)||Infinity;
+    const termo=busca.value.toLowerCase();
+    let list = todosImoveis.filter(item=>
+      (cidade===''||item.Cidade===cidade)&&
+      (tipo===''||item['Tipo de Imóvel']===tipo)&&
+      (parseFloat(item.Preço)>=pMin && parseFloat(item.Preço)<=pMax)&&
+      (parseInt(item.Quartos)>=qMin && parseInt(item.Quartos)<=qMax)&&
+      (item.Bairro.toLowerCase().includes(termo) || (item.Referencia||'').toLowerCase().includes(termo) || (item.Descricao||'').toLowerCase().includes(termo))
+    );
+
+    // Ordenação
+    if(ordenar.value==='preco-asc') list.sort((a,b)=>parseFloat(a.Preço)-parseFloat(b.Preço));
+    if(ordenar.value==='preco-desc') list.sort((a,b)=>parseFloat(b.Preço)-parseFloat(a.Preço));
+    if(ordenar.value==='data-desc') list.sort((a,b)=>new Date(b.Data)-new Date(a.Data));
+
+    list.forEach(item=>{
+      const card = document.createElement('div');
+      card.className='card'+(item.Destaque==='Sim'?' destaque':'');
+      const imagens=(item['Link Fotos']||'').split(',').map(u=>u.trim()).filter(u=>u);
+      card.innerHTML=`
+        ${item.Destaque==='Sim'?'<div class="tag-destaque">Destaque</div>':''}
+        ${item.EstadoVenda==='Vendido'?'<div class="tag-vendido">Vendido</div>':''}
+        <div class="slider">${imagens.map((img,idx)=>`<img src="${img}" class="${idx===0?'active':''}"/>`).join('')}</div>
+        <div class="card-content">
+          <h3>${item['Tipo de Imóvel']} – ${item['Cidade']}</h3>
+          <p><strong class="preco-destaque">Preço:</strong> ${item['Preço']}</p>
+          <p><strong>Bairro:</strong> ${item['Bairro']}</p>
+          <p><strong>Quartos:</strong> ${item['Quartos']}</p>
+          <a href="https://wa.me/${item['Telefone/WhatsApp']}" class="btn">Contactar via WhatsApp</a>
+        </div>
+      `;
+      container.appendChild(card);
+
+      const sliderImgs=card.querySelectorAll('.slider img');
+      if(sliderImgs.length>1){
+        let idx=0;
+        setInterval(()=>{
+          sliderImgs[idx].classList.remove('active');
+          idx=(idx+1)%sliderImgs.length;
+          sliderImgs[idx].classList.add('active');
+        },3000);
+      }
+    });
+  }
+});
+</script>
+</body>
+</html>
